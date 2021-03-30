@@ -14,6 +14,10 @@ module Enumerable
         expect(array_string.my_each { |x| x }).to eq(array_string.each { |x| }) # enforcing empty block usage
       end
 
+      it 'will not return the same array to the user' do
+        expect(array_string.my_each { |x| }).not_to eq(range_number.each { |x| }) # enforcing empty block usage
+      end
+
       it 'return an array with the elments of the range inclusive' do
         expect(range_number.my_each { |x| x }).to eq(range_number.my_each { |x| }) # enforcing empty block usage
       end
@@ -27,6 +31,11 @@ module Enumerable
     context '#my_each_with_index' do
       it 'return the same array to the user' do
         expect(array_int.my_each_with_index { |x, _i| x }).to eq(array_int.each_with_index { |x, _i| x })
+      end
+
+      it 'will not return the same array to the user' do
+        expect(array_string.my_each_with_index { |x| }).not_to eq(range_number.my_each_with_index do |x| # empty
+                                                                  end) # enforcing empty
       end
 
       it 'return an array of numbers which index is multiples of 4' do
@@ -54,6 +63,14 @@ module Enumerable
 
       it 'return an array of numbers which index is multiples of 4' do
         expect(range_number.my_select { |x| x if (x % 4).zero? }).to eq(range_number.select { |x| x if (x % 4).zero? })
+      end
+
+      it 'does not return an array of numbers which index is multiples of 4' do
+        expect(range_number.my_select do |x|
+                 x if (x % 6).zero?
+               end).not_to eq(range_number.select do |x|
+                                x if (x % 4).zero?
+                              end)
       end
 
       it 'return an array of numbers which index is multiples of 4' do
@@ -164,6 +181,10 @@ module Enumerable
         expect(array_int.my_count).to eq(5)
       end
 
+      it 'count the number of items in the given array' do
+        expect(array_int.my_count).not_to eq(0)
+      end
+
       it 'count the number of occurences (number 2) in the given array' do
         expect(array_int.my_count(2)).to eq(1)
       end
@@ -181,6 +202,10 @@ module Enumerable
 
       it 'replace each item of the array with the given word (cat)' do
         expect(array_int.my_map { 'cat' }).to eq(array_int.map { 'cat' })
+      end
+
+      it 'replace each item of the array with the given word (dog)' do
+        expect(array_int.my_map { 'cat' }).not_to eq(array_int.map { 'dog' })
       end
 
       it 'sum each item of the range with itself. If both a proc and a block are passed, only consider the proc' do
@@ -202,12 +227,20 @@ module Enumerable
       it 'return the multiplication of the items of a given array starting with 1' do
         expect(array_int.my_inject(1, :*)).to eq(array_int.inject(1, :*))
       end
+
+      it 'should not return the multiplication of the items of a given array starting with 1' do
+        expect(array_int.my_inject(0, :*)).not_to eq(array_int.inject(1, :*))
+      end
     end
 
     # multiply_els =====================================================================================
     context 'multiply_els' do
       it 'return the multiplication of the items of a given array' do
         expect(multiply_els(array_int)).to eq(array_int.inject(1, :*))
+      end
+
+      it 'should return the multiplication of the items of a given array' do
+        expect(multiply_els(range_number)).not_to eq(array_int.inject(1, :*))
       end
     end
   end
